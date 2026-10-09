@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asteroid Avengers - NASA Research Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
+
+    <!-- Top Toast Notification Banner -->
+    <div id="toast" class="fixed top-20 right-4 z-50 transform translate-x-full opacity-0 transition-all duration-300 pointer-events-none">
+        <div id="toast-content" class="bg-slate-900 border border-cyan-500/50 text-cyan-200 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm">
+            <span id="toast-icon">✨</span>
+            <span id="toast-msg">API Key saved successfully!</span>
+        </div>
+    </div>
+
+    <!-- Header & Global API Key Management -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 p-4 shadow-xl sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
+            
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-950">
+                    <span class="text-xl">🚀</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                        ASTEROID AVENGERS
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">NASA Space Apps Challenge • Live Research Hub</p>
+                </div>
+            </div>
+
+            <!-- API Key Bar -->
+            <div class="flex flex-wrap items-center justify-center gap-2 bg-slate-950/80 px-4 py-2 rounded-xl border border-slate-800 w-full lg:w-auto">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-400 font-medium">NASA Key:</span>
+                    <input type="password" id="user-api-key" placeholder="Enter NASA API Key or use DEMO_KEY" 
+                           class="bg-slate-900 border border-slate-700 focus:border-cyan-500 px-3 py-1.5 rounded-lg text-xs text-cyan-300 outline-none w-44 sm:w-60 transition"
+                           autocomplete="off">
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="saveApiKey()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-3 py-1.5 rounded-lg transition font-semibold shadow hover:shadow-cyan-900 flex items-center gap-1">
+                        <span>💾</span> Save & Apply
+                    </button>
+                    <button onclick="clearApiKey()" title="Reset to DEMO_KEY" class="bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-xs px-2.5 py-1.5 rounded-lg transition font-medium border border-slate-700">
+                        Reset
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 pl-1 border-l border-slate-800">
+                    <span id="key-status-indicator" class="text-[11px] px-2 py-0.5 rounded-full font-medium bg-amber-950/60 text-amber-300 border border-amber-800/60">
+                        DEMO_KEY Active
+                    </span>
+                    <a href="https://api.nasa.gov/" target="_blank" rel="noopener" class="text-[11px] text-cyan-400 hover:underline flex items-center gap-0.5" title="Sign up for an official free key at api.nasa.gov">
+                        Get Key ↗
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Navigation Bar: 5 Dedicated Tabs -->
+    <nav class="bg-slate-900/60 border-b border-slate-800/80 py-2.5 overflow-x-auto sticky top-[73px] z-30 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto flex justify-start md:justify-center gap-2 px-4 min-w-max">
+            <button onclick="switchTab('images')" class="tab-btn px-4 py-2 rounded-xl bg-cyan-700 text-white text-sm font-semibold transition flex items-center gap-2 shadow-sm" data-tab="images">
+                <span>🖼️</span> NASA Media Library
+            </button>
+            <button onclick="switchTab('apod')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white text-sm font-medium transition flex items-center gap-2" data-tab="apod">
+                <span>✨</span> APOD (Astronomy Pic)
+            </button>
+            <button onclick="switchTab('epic')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white text-sm font-medium transition flex items-center gap-2" data-tab="epic">
+                <span>🌍</span> DSCOVR EPIC Earth
+            </button>
+            <button onclick="switchTab('weather')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white text-sm font-medium transition flex items-center gap-2" data-tab="weather">
+                <span>🌡️</span> Mars Weather (InSight)
+            </button>
+            <button onclick="switchTab('fireball')" class="tab-btn px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white text-sm font-medium transition flex items-center gap-2" data-tab="fireball">
+                <span>🔥</span> Fireball Telemetry (CNEOS)
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto p-4 md:p-8 flex-1 w-full">
+
+        <!-- TAB 1: NASA Image & Video Library -->
+        <section id="tab-images" class="space-section">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-cyan-400">NASA Image & Video Library</h2>
+                <p class="text-slate-400 text-sm mt-1">Direct live archive from <code class="text-cyan-300 bg-slate-900 px-1.5 py-0.5 rounded text-xs">images-api.nasa.gov</code> across historical missions & cosmic surveys.</p>
+            </div>
+            
+            <!-- Search & Filter Controls -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-8 shadow-lg max-w-4xl mx-auto">
+                <div class="flex flex-col sm:flex-row items-center gap-3 mb-3">
+                    <div class="relative flex-1 w-full">
+                        <input type="text" id="image-search-input" placeholder="Search any NASA mission, planet, or topic..." 
+                               class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-500 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-2.5 outline-none transition"
+                               onkeydown="if(event.key === 'Enter') handleCustomSearch()">
+                    </div>
+                    <button onclick="handleCustomSearch()" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow">
+                        <span>🔍</span> Search
+                    </button>
+                    <select id="media-type-filter" onchange="changeMediaType(this.value)" class="w-full sm:w-auto bg-slate-950 border border-slate-700 text-cyan-300 text-xs px-3.5 py-2.5 rounded-xl outline-none transition font-medium">
+                        <option value="">All Media (Image & Video)</option>
+                        <option value="image">Images Only</option>
+                        <option value="video">Videos Only</option>
+                    </select>
+                </div>
+
+                <!-- Quick Query Presets -->
+                <div class="flex flex-wrap items-center justify-center gap-2 pt-2 border-t border-slate-800/60">
+                    <span class="text-xs text-slate-400 mr-1">Quick Explorer:</span>
+                    <button onclick="changeQuery('Opportunity Rover')" class="preset-btn bg-slate-800 hover:bg-cyan-600 hover:text-white px-3 py-1 rounded-lg text-xs border border-slate-700 transition">Opportunity</button>
+                    <button onclick="changeQuery('Curiosity Rover')" class="preset-btn bg-slate-800 hover:bg-cyan-600 hover:text-white px-3 py-1 rounded-lg text-xs border border-slate-700 transition">Curiosity</button>
+                    <button onclick="changeQuery('Mars Perseverance')" class="preset-btn bg-slate-800 hover:bg-cyan-600 hover:text-white px-3 py-1 rounded-lg text-xs border border-slate-700 transition">Perseverance</button>
+                    <button onclick="changeQuery('James Webb Telescope')" class="preset-btn bg-slate-800 hover:bg-cyan-600 hover:text-white px-3 py-1 rounded-lg text-xs border border-slate-700 transition">JWST</button>
+                    <button onclick="changeQuery('Apollo 11')" class="preset-btn bg-slate-800 hover:bg-cyan-600 hover:text-white px-3 py-1 rounded-lg text-xs border border-slate-700 transition">Apollo 11</button>
+                    <button onclick="changeQuery('Asteroid Bennu OSIRIS-REx')" class="preset-btn bg-slate-800 hover:bg-cyan-600 hover:text-white px-3 py-1 rounded-lg text-xs border border-slate-700 transition">Asteroid Bennu</button>
+                </div>
+            </div>
+
+            <!-- Loading Spinner State -->
+            <div id="images-loading" class="text-center text-cyan-400 my-16 hidden">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-cyan-500 border-t-transparent mb-3"></div>
+                <p class="text-sm font-medium">Querying NASA Media Library live servers...</p>
+            </div>
+            
+            <!-- Media Grid -->
+            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            
+            <!-- Pagination Controls -->
+            <div id="images-pagination" class="flex justify-center items-center gap-4 my-10 hidden">
+                <button onclick="changeImagePage(-1)" id="img-prev-btn" class="bg-slate-800 hover:bg-cyan-600 disabled:opacity-40 disabled:hover:bg-slate-800 text-white border border-slate-700 px-5 py-2.5 rounded-xl transition font-medium text-sm flex items-center gap-1.5 shadow">
+                    ← Previous
+                </button>
+                <span id="img-page-indicator" class="text-cyan-400 font-bold text-sm bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl">Page 1</span>
+                <button onclick="changeImagePage(1)" id="img-next-btn" class="bg-slate-800 hover:bg-cyan-600 disabled:opacity-40 disabled:hover:bg-slate-800 text-white border border-slate-700 px-5 py-2.5 rounded-xl transition font-medium text-sm flex items-center gap-1.5 shadow">
+                    Next Page →
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 2: APOD (Astronomy Picture of the Day) -->
+        <section id="tab-apod" class="space-section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-cyan-400">Astronomy Picture of the Day</h2>
+                <p class="text-slate-400 text-sm mt-1">9 distinct high-resolution captures per page from official NASA APOD astronomy feeds.</p>
+            </div>
+            
+            <div id="apod-loading" class="text-center text-cyan-400 my-16 hidden">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-cyan-500 border-t-transparent mb-3"></div>
+                <p class="text-sm font-medium">Fetching authentic APOD captures from NASA...</p>
+            </div>
+
+            <div id="apod-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <div id="apod-pagination" class="flex justify-center items-center gap-4 my-10 hidden">
+                <button onclick="changeApodPage(-1)" id="apod-prev-btn" class="bg-slate-800 hover:bg-cyan-600 disabled:opacity-40 disabled:hover:bg-slate-800 text-white border border-slate-700 px-5 py-2.5 rounded-xl transition font-medium text-sm flex items-center gap-1.5 shadow">
+                    ← Previous Page
+                </button>
+                <span id="apod-page-indicator" class="text-cyan-400 font-bold text-sm bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl">Page 1</span>
+                <button onclick="changeApodPage(1)" id="apod-next-btn" class="bg-slate-800 hover:bg-cyan-600 disabled:opacity-40 disabled:hover:bg-slate-800 text-white border border-slate-700 px-5 py-2.5 rounded-xl transition font-medium text-sm flex items-center gap-1.5 shadow">
+                    Next Page →
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 3: EPIC (Earth Polychromatic Imaging Camera) -->
+        <section id="tab-epic" class="space-section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-cyan-400">DSCOVR EPIC Earth Imagery</h2>
+                <p class="text-slate-400 text-sm mt-1">Full-disc natural color Earth captures taken from the Sun-Earth L1 Lagrange Point (1 million miles away).</p>
+            </div>
+
+            <div id="epic-loading" class="text-center text-cyan-400 my-16 hidden">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-cyan-500 border-t-transparent mb-3"></div>
+                <p class="text-sm font-medium">Connecting to DSCOVR telemetry and retrieving Earth disc imagery...</p>
+            </div>
+
+            <div id="epic-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- TAB 4: Mars Weather (InSight) -->
+        <section id="tab-weather" class="space-section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-cyan-400">Mars InSight Weather Station</h2>
+                <p class="text-slate-400 text-sm mt-1">Direct surface meteorology downlink from Elysium Planitia on Mars.</p>
+            </div>
+
+            <div id="weather-loading" class="text-center text-cyan-400 my-16 hidden">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-cyan-500 border-t-transparent mb-3"></div>
+                <p class="text-sm font-medium">Downlinking Mars atmospheric telemetry...</p>
+            </div>
+
+            <div id="weather-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- TAB 5: Fireball Data (CNEOS) -->
+        <section id="tab-fireball" class="space-section hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-cyan-400">Fireball & Bolide Telemetry (CNEOS)</h2>
+                <p class="text-slate-400 text-sm mt-1">Atmospheric impact events recorded by NASA sensors worldwide with calibrated energy metrics.</p>
+            </div>
+
+            <div id="fireball-loading" class="text-center text-cyan-400 my-16 hidden">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-cyan-500 border-t-transparent mb-3"></div>
+                <p class="text-sm font-medium">Querying NASA JPL Center for Near Earth Object Studies (CNEOS)...</p>
+            </div>
+
+            <div id="fireball-container" class="table-container overflow-x-auto bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-6 text-center text-xs text-slate-500">
+        <p>Asteroid Avengers • Developed for NASA Space Apps Challenge</p>
+        <p class="mt-1">Powered by official NASA Open APIs (<code class="text-slate-400">api.nasa.gov</code>, <code class="text-slate-400">images-api.nasa.gov</code>, <code class="text-slate-400">ssd-api.jpl.nasa.gov</code>)</p>
+    </footer>
+
+    <!-- Modal for Detailed Asset Inspection & High-Res Download -->
+    <div id="media-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 w-9 h-9 rounded-full flex items-center justify-center text-xl font-bold transition">
+                &times;
+            </button>
+            <div id="modal-content" class="mt-2"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
